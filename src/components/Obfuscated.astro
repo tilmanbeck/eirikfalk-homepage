@@ -1,0 +1,31 @@
+---
+/**
+ * Renders an email address or phone number so that plain crawlers do not see it.
+ * The parts are reversed in the markup and assembled on the client.
+ * No-JS fallback shows a human-readable form.
+ */
+interface Props {
+  kind: 'email' | 'phone';
+  value: string; // full address or E.164 phone
+  display?: string; // optional display text (phone)
+  class?: string;
+}
+const { kind, value, display, class: cls } = Astro.props;
+const rev = (s: string) => s.split('').reverse().join('');
+const href = kind === 'email' ? `mailto:${value}` : `tel:${value}`;
+const shown = display ?? value;
+const fallback =
+  kind === 'email' ? value.replace('@', ' [at] ').replace(/\./g, ' [dot] ') : shown.replace(/\d{3}(?=\d)/g, '$& ');
+---
+
+<a class={cls} data-obf={kind} data-h={rev(href)} data-s={rev(shown)} href="#"><span>{fallback}</span></a>
+<script>
+  const rev = (s: string) => s.split('').reverse().join('');
+  document.querySelectorAll<HTMLAnchorElement>('a[data-obf]').forEach((a) => {
+    a.href = rev(a.dataset.h ?? '');
+    const span = a.querySelector('span');
+    if (span) span.textContent = rev(a.dataset.s ?? '');
+    a.removeAttribute('data-h');
+    a.removeAttribute('data-s');
+  });
+</script>

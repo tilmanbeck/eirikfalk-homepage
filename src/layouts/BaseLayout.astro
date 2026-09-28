@@ -1,0 +1,101 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FontToggle from '../components/FontToggle.astro';
+import { alternatePath, locales, type Locale } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+const { title, description, ogImage = '/og-default.jpg' } = Astro.props;
+const locale = (Astro.currentLocale ?? 'de') as Locale;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const site = Astro.site ?? new URL('https://eirikfalk.de');
+const canonical = new URL(path, site);
+const fontPreview = import.meta.env.PUBLIC_FONT_PREVIEW !== 'false';
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {
+      locales.map((l) => (
+        <link rel="alternate" hreflang={l} href={new URL(alternatePath(path, locale, l), site)} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(alternatePath(path, locale, 'de'), site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, site)} />
+    <meta property="og:locale" content={locale === 'de' ? 'de_DE' : 'en_GB'} />
+    <meta name="theme-color" content="#f4f2ec" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      // Font pairing preview: ?fonts=b or a remembered choice. Runs before paint to avoid a flash.
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search).get('fonts');
+          if (q === 'a' || q === 'b') localStorage.setItem('fonts', q);
+          var f = localStorage.getItem('fonts');
+          if (f === 'b') document.documentElement.setAttribute('data-fonts', 'b');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip sr-only" href="#main">{locale === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    {fontPreview && <FontToggle />}
+    <script>
+      // Scroll reveal. Motivation: brings sections in one at a time so the eye lands on the headline first.
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const els = document.querySelectorAll<HTMLElement>('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.1 },
+        );
+        els.forEach((el) => io.observe(el));
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip:focus {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    clip: auto;
+    background: var(--c-soil);
+    color: var(--c-paper);
+    z-index: 100;
+  }
+</style>

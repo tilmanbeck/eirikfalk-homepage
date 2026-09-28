@@ -1,0 +1,56 @@
+---
+import { useTranslations, route, site, type Locale } from '../i18n/ui';
+const locale = (Astro.currentLocale ?? 'de') as Locale;
+const t = useTranslations(locale);
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__col">
+      <p class="display footer__name">Eirik Falk</p>
+      <p class="small muted">{t('site.role')}, Darmstadt</p>
+    </div>
+    <ul class="footer__links">
+      <li><a class="link--quiet link" href={site.instagram} rel="me noopener" target="_blank">Instagram</a></li>
+      <li><a class="link--quiet link" href={site.operabase} rel="noopener" target="_blank">Operabase</a></li>
+      <li><a class="link--quiet link" href={site.muvac} rel="noopener" target="_blank">Muvac</a></li>
+      <li><a class="link--quiet link" href={locale === 'de' ? '/konzerte.ics' : '/concerts.ics'}>{t('footer.calendar')}</a></li>
+    </ul>
+    <ul class="footer__links footer__links--legal">
+      <li><a class="link--quiet link" href={route('imprint', locale)}>{t('footer.imprint')}</a></li>
+      <li><a class="link--quiet link" href={route('privacy', locale)}>{t('footer.privacy')}</a></li>
+      <li class="small muted">© {year} Eirik Falk. {t('footer.rights')}</li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--c-basil-tint);
+    padding-block: var(--space-xl) var(--space-l);
+  }
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: var(--space-l);
+    align-items: start;
+  }
+  .footer__name {
+    font-size: var(--step-2);
+  }
+  .footer__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+    font-size: var(--step--1);
+  }
+  @media (max-width: 799px) {
+    .footer__inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-m);
+    }
+  }
+</style>

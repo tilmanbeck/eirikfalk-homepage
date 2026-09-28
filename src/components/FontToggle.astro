@@ -1,0 +1,55 @@
+---
+// Preview-only control to compare the two agreed font pairings. Remove after the home-page review.
+---
+
+<div class="font-toggle" role="group" aria-label="Font pairing preview">
+  <button type="button" data-fonts="a">A Fraunces</button>
+  <button type="button" data-fonts="b">B Instrument</button>
+</div>
+<script>
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.font-toggle button');
+  const sync = () => {
+    const cur = root.getAttribute('data-fonts') === 'b' ? 'b' : 'a';
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fonts === cur)));
+  };
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const v = b.dataset.fonts === 'b' ? 'b' : 'a';
+      if (v === 'b') root.setAttribute('data-fonts', 'b');
+      else root.removeAttribute('data-fonts');
+      try {
+        localStorage.setItem('fonts', v);
+      } catch {}
+      sync();
+    }),
+  );
+  sync();
+</script>
+<style>
+  .font-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 30;
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: var(--c-soil);
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  .font-toggle button {
+    border: 0;
+    background: transparent;
+    color: var(--c-paper);
+    padding: 0.4em 0.7em;
+    cursor: pointer;
+    font: inherit;
+    border-radius: 2px;
+  }
+  .font-toggle button[aria-pressed='true'] {
+    background: var(--c-paper);
+    color: var(--c-soil);
+  }
+</style>

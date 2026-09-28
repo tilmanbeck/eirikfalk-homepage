@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomePage from '../../components/HomePage.astro';
+import { getEntry } from 'astro:content';
+const page = await getEntry('pages', 'en/home');
+---
+
+<BaseLayout title={page!.data.title} description={page!.data.description}>
+  <HomePage locale="en" />
+</BaseLayout>

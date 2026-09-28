@@ -1,0 +1,462 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, getEntry } from 'astro:content';
+import { useTranslations, route, pick, site, type Locale } from '../i18n/ui';
+import Obfuscated from './Obfuscated.astro';
+import portrait from '../assets/portraits/portrait-1.jpg';
+import pianoRoom from '../assets/piano-room.jpg';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const page = await getEntry('pages', `${locale}/home`);
+if (!page) throw new Error(`Missing content/pages/${locale}/home.md`);
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const upcoming = (await getCollection('concerts', ({ data }) => data.date >= today))
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
+  .slice(0, 3);
+
+const testimonial = (await getCollection('testimonials', ({ data }) => data.context === 'teaching')).sort(
+  (a, b) => Number(b.data.featured) - Number(a.data.featured),
+)[0];
+
+const fmtDay = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit' });
+const fmtMonth = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', { month: 'short', year: 'numeric' });
+const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', { weekday: 'long' });
+---
+
+<!-- Hero: asymmetric split. Portrait at column width (source is ~1100px), name and tagline beside it. -->
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div class="hero__text">
+      <h1 class="hero__name">Eirik<br />Falk</h1>
+      <p class="hero__tagline">{page.data.tagline}</p>
+      <div class="hero__actions">
+        <a class="btn" href={route('contact', locale)}>{t('cta.contact')} <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="link link--quiet" href={route('concerts', locale)}>{t('nav.concerts')}</a>
+      </div>
+    </div>
+    <figure class="hero__figure">
+      <div class="hero__block" aria-hidden="true"></div>
+      <div class="photo hero__photo">
+        <Image
+          src={portrait}
+          alt={locale === 'de' ? 'Porträt von Eirik Falk' : 'Portrait of Eirik Falk'}
+          widths={[480, 720, 1086]}
+          sizes="(max-width: 799px) 100vw, 44vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- Intro: single narrow column. -->
+<section class="section intro">
+  <div class="wrap">
+    <div class="intro__inner reveal">
+      <p class="intro__text">{page.data.intro}</p>
+      <a class="link" href={route('about', locale)}>{t('intro.more')}</a>
+    </div>
+  </div>
+</section>
+
+<!-- Concerts: date-led list with hairlines, or an empty state. -->
+<section class="section section--tight concerts">
+  <div class="wrap">
+    <div class="concerts__head reveal">
+      <h2 class="concerts__heading">{t('concerts.heading')}</h2>
+      <a class="link" href={route('concerts', locale)}>{t('concerts.all')}</a>
+    </div>
+    {
+      upcoming.length === 0 ? (
+        <div class="concerts__empty reveal">
+          <p class="display concerts__emptyTitle">{t('concerts.empty')}</p>
+          <p class="muted">{t('concerts.emptyHint')}</p>
+        </div>
+      ) : (
+        <ol class="concerts__list">
+          {upcoming.map((c, i) => (
+            <li class="concert reveal" style={`--delay:${i * 80}ms`}>
+              <time class="concert__date" datetime={c.data.date.toISOString().slice(0, 10)}>
+                <span class="concert__day">{fmtDay.format(c.data.date)}</span>
+                <span class="concert__month">{fmtMonth.format(c.data.date)}</span>
+                <span class="concert__weekday small muted">
+                  {fmtWeekday.format(c.data.date)}
+                  {c.data.time && `, ${c.data.time}`}
+                </span>
+              </time>
+              <div class="concert__body">
+                <h3 class="concert__title">{pick(c.data.title, locale)}</h3>
+                {c.data.role && <p class="concert__role">{pick(c.data.role, locale)}</p>}
+                <p class="concert__place muted">{c.data.place}</p>
+              </div>
+              <div class="concert__aside">
+                {c.data.link && (
+                  <a class="link" href={c.data.link} rel="noopener" target="_blank">
+                    {t('concerts.tickets')}
+                  </a>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  </div>
+</section>
+
+<!-- Services: one Basil section. Two text columns on the left, photo-led lessons column on the right. -->
+<section class="section section--basil services">
+  <div class="wrap services__grid">
+    <h2 class="services__heading reveal">{t('services.heading')}</h2>
+
+    <div class="services__text">
+      <article class="service reveal" style="--delay:60ms">
+        <h3 class="service__title">{t('services.solo')}</h3>
+        <p class="service__text">{t('services.soloText')}</p>
+        <a class="link link--onbasil" href={`${route('services', locale)}#solist`}>{t('services.more')}</a>
+      </article>
+      <article class="service reveal" style="--delay:120ms">
+        <h3 class="service__title">{t('services.choir')}</h3>
+        <p class="service__text">{t('services.choirText')}</p>
+        <a class="link link--onbasil" href={`${route('services', locale)}#chorist`}>{t('services.more')}</a>
+      </article>
+    </div>
+
+    <article class="service service--lessons reveal" style="--delay:180ms">
+      <div class="photo service__photo">
+        <Image
+          src={pianoRoom}
+          alt={locale === 'de' ? 'Unterrichtsraum mit E-Piano und Gitarre' : 'Teaching room with electric piano and guitar'}
+          widths={[480, 720, 960, 1200]}
+          sizes="(max-width: 799px) 100vw, 40vw"
+        />
+      </div>
+      <h3 class="service__title">{t('services.lessons')}</h3>
+      <p class="service__text">{t('services.lessonsText')}</p>
+      <a class="link link--onbasil" href={site.lessons} rel="noopener" target="_blank">{t('services.lessonsLink')}</a>
+    </article>
+  </div>
+</section>
+
+<!-- Testimonial: one quote, serif, centred (the message is the design here). -->
+{
+  testimonial && (
+    <section class="section testimonial">
+      <div class="wrap">
+        <figure class="testimonial__figure reveal">
+          <blockquote class="testimonial__quote display">
+            <p>„{pick(testimonial.data.quote, locale)}“</p>
+          </blockquote>
+          <figcaption class="small muted">
+            {t('testimonial.note')}
+            {testimonial.data.author && `, ${testimonial.data.author}`}
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+<!-- Contact: heading, two obfuscated channels. -->
+<section class="section contact" id="kontakt">
+  <div class="wrap contact__grid">
+    <div class="reveal">
+      <h2 class="contact__heading">{t('contact.heading')}</h2>
+      <p class="muted contact__text">{t('contact.text')}</p>
+    </div>
+    <dl class="contact__list reveal" style="--delay:80ms">
+      <div>
+        <dt class="label">{t('contact.email')}</dt>
+        <dd><Obfuscated kind="email" value={site.email} class="link contact__link" /></dd>
+      </div>
+      <div>
+        <dt class="label">{t('contact.phone')}</dt>
+        <dd><Obfuscated kind="phone" value={site.phone} display={site.phoneDisplay} class="link contact__link" /></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  /* ---- Hero ---- */
+  .hero {
+    padding-block: clamp(2rem, 5vh, 4.5rem) var(--space-xl);
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--space-m);
+    align-items: center;
+  }
+  .hero__text {
+    grid-column: 1 / span 6;
+    padding-right: var(--space-l);
+  }
+  .hero__name {
+    font-size: var(--step-5);
+    line-height: 0.92;
+    margin-bottom: var(--space-m);
+  }
+  .hero__tagline {
+    font-size: var(--step-1);
+    line-height: 1.4;
+    max-width: 26ch;
+    text-wrap: pretty;
+    margin-bottom: var(--space-l);
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-m);
+  }
+  .hero__figure {
+    grid-column: 7 / span 6;
+    margin: 0;
+    position: relative;
+    padding: 0 0 var(--space-m) var(--space-m);
+  }
+  .hero__block {
+    position: absolute;
+    inset: var(--space-l) 0 0 0;
+    background: var(--c-basil);
+  }
+  .hero__photo {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    max-height: min(74vh, 720px);
+    margin-left: auto;
+  }
+  .hero__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---- Intro ---- */
+  .intro {
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+  .intro__inner {
+    max-width: var(--measure);
+    margin-left: calc(100% / 12 * 2);
+  }
+  .intro__text {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-variation-settings: 'opsz' 24;
+    font-size: var(--step-2);
+    line-height: 1.35;
+    text-wrap: pretty;
+    margin-bottom: var(--space-m);
+  }
+
+  /* ---- Concerts ---- */
+  .concerts {
+    border-top: 1px solid var(--c-basil-tint);
+  }
+  .concerts__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-m);
+    margin-bottom: var(--space-l);
+  }
+  .concerts__heading {
+    font-size: var(--step-3);
+  }
+  .concerts__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .concert {
+    display: grid;
+    grid-template-columns: 9rem 1fr auto;
+    gap: var(--space-m) var(--space-l);
+    padding-block: var(--space-m);
+    border-top: 1px solid var(--c-basil-tint);
+    align-items: start;
+  }
+  .concert:last-child {
+    border-bottom: 1px solid var(--c-basil-tint);
+  }
+  .concert__date {
+    display: grid;
+    line-height: 1.1;
+  }
+  .concert__day {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--step-4);
+    line-height: 0.9;
+    color: var(--c-tomato);
+  }
+  .concert__month {
+    margin-top: 0.3rem;
+    font-weight: 600;
+  }
+  .concert__weekday {
+    margin-top: 0.2rem;
+  }
+  .concert__title {
+    font-size: var(--step-2);
+    margin-bottom: 0.25rem;
+  }
+  .concert__role {
+    font-weight: 500;
+  }
+  .concerts__empty {
+    padding: var(--space-xl) 0;
+    border-block: 1px solid var(--c-basil-tint);
+  }
+  .concerts__emptyTitle {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-xs);
+  }
+
+  /* ---- Services ---- */
+  .services {
+    color: var(--c-soil);
+  }
+  .services__grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-l) var(--space-m);
+  }
+  .services__heading {
+    grid-column: 1 / -1;
+    font-size: var(--step-3);
+  }
+  .service__title {
+    font-size: var(--step-2);
+    margin-bottom: var(--space-xs);
+  }
+  .service__text {
+    margin-bottom: var(--space-s);
+    max-width: 38ch;
+    text-wrap: pretty;
+  }
+  .services__text {
+    grid-column: 1 / span 5;
+    display: grid;
+    align-content: start;
+    gap: var(--space-l);
+  }
+  .services__text .service + .service {
+    padding-top: var(--space-l);
+    border-top: 1px solid var(--c-basil-deep);
+  }
+  .service--lessons {
+    grid-column: 7 / span 6;
+  }
+  .service__photo {
+    aspect-ratio: 4 / 3;
+    margin-bottom: var(--space-m);
+  }
+  .link--onbasil {
+    color: var(--c-soil);
+    text-decoration-color: var(--c-basil-deep);
+  }
+  .link--onbasil:hover {
+    color: var(--c-paper);
+    text-decoration-color: var(--c-paper);
+  }
+
+  /* ---- Testimonial ---- */
+  .testimonial__figure {
+    margin: 0 auto;
+    max-width: 44ch;
+    text-align: center;
+  }
+  .testimonial__quote {
+    margin: 0 0 var(--space-m);
+    font-size: var(--step-2);
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 36;
+    text-wrap: pretty;
+  }
+
+  /* ---- Contact ---- */
+  .contact {
+    border-top: 1px solid var(--c-basil-tint);
+  }
+  .contact__grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--space-l);
+    align-items: end;
+  }
+  .contact__heading {
+    font-size: var(--step-3);
+    max-width: 18ch;
+    margin-bottom: var(--space-s);
+  }
+  .contact__list {
+    margin: 0;
+    display: grid;
+    gap: var(--space-m);
+  }
+  .contact__list dd {
+    margin: 0.25rem 0 0;
+  }
+  .contact__link {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--step-2);
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  /* ---- Mobile collapse: every multi-column grid becomes a single column ---- */
+  @media (max-width: 799px) {
+    .hero {
+      padding-top: var(--space-m);
+    }
+    .hero__grid {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-l);
+    }
+    .hero__text {
+      grid-column: 1;
+      grid-row: 2;
+      padding-right: 0;
+    }
+    .hero__figure {
+      grid-column: 1;
+      grid-row: 1;
+      padding: 0 0 var(--space-s) var(--space-s);
+    }
+    .hero__photo {
+      max-height: 70vh;
+    }
+    .intro__inner {
+      margin-left: 0;
+    }
+    .concert {
+      grid-template-columns: 5.5rem 1fr;
+    }
+    .concert__aside {
+      grid-column: 2;
+    }
+    .services__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+    .services__text,
+    .service--lessons {
+      grid-column: 1;
+    }
+    .contact__grid {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+  }
+</style>

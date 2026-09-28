@@ -17,14 +17,15 @@ const items = [
 
 <header class="header">
   <div class="wrap header__inner">
-    <a class="brand" href={route('home', locale)} aria-label={t('site.name')}>
+    <a class="brand" href={route('home', locale)}>
       <span class="brand__name">Eirik Falk</span>
       <span class="brand__role">{t('site.role')}</span>
     </a>
 
-    <input type="checkbox" id="nav-toggle" class="nav-toggle sr-only" />
-    <label for="nav-toggle" class="nav-burger" aria-label={t('nav.menu')}>
-      <span></span><span></span>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle sr-only" aria-label={t('nav.menu')} />
+    <label for="nav-toggle" class="nav-burger">
+      <span class="sr-only">{t('nav.menu')}</span>
+      <span class="nav-burger__bar" aria-hidden="true"></span><span class="nav-burger__bar" aria-hidden="true"></span>
     </label>
 
     <nav class="nav" aria-label="Main">
@@ -110,7 +111,7 @@ const items = [
     right: 0;
     bottom: 0;
     height: 1px;
-    background: var(--c-tomato);
+    background: var(--c-tomato-text);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.3s var(--ease-out);
@@ -140,7 +141,7 @@ const items = [
       cursor: pointer;
       margin-right: -8px;
     }
-    .nav-burger span {
+    .nav-burger__bar {
       display: block;
       width: 22px;
       height: 1.5px;
@@ -166,14 +167,14 @@ const items = [
       visibility: visible;
       transition-delay: 0s;
     }
-    .nav-toggle:checked ~ .nav-burger span:first-child {
+    .nav-toggle:checked ~ .nav-burger .nav-burger__bar:first-of-type {
       transform: translateY(3.75px) rotate(45deg);
     }
-    .nav-toggle:checked ~ .nav-burger span:last-child {
+    .nav-toggle:checked ~ .nav-burger .nav-burger__bar:last-of-type {
       transform: translateY(-3.75px) rotate(-45deg);
     }
     .nav-toggle:focus-visible ~ .nav-burger {
-      outline: 2px solid var(--c-tomato);
+      outline: 2px solid var(--c-tomato-text);
       outline-offset: 2px;
     }
     .nav__list {

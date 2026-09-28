@@ -16,8 +16,9 @@
   --c-basil-tint: #e3e8df;   /* very light basil for hairlines on paper */
   --c-soil: #54301a;         /* 19-1218 TCX Potting Soil, all text */
   --c-soil-soft: #7a5a48;    /* secondary text on paper (~5:1) */
-  --c-tomato: #e2462c;       /* 17-1563 TCX Cherry Tomato, accent only */
-  --c-tomato-deep: #c53a22;  /* accent hover, 5.6:1 on paper */
+  --c-tomato: #e2462c;       /* 17-1563 TCX Cherry Tomato: large display numbers, decoration (3.7:1 on paper) */
+  --c-tomato-text: #b8371f;  /* deepened tomato for links and buttons (5.2:1 on paper, paper text on it 5.2:1) */
+  --c-tomato-deep: #9e2e19;  /* hover state for links and buttons */
 
   /* Pairing A (default): Fraunces + Manrope */
   --font-display: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
@@ -109,7 +110,7 @@ a {
   text-decoration: none;
 }
 :focus-visible {
-  outline: 2px solid var(--c-tomato);
+  outline: 2px solid var(--c-tomato-text);
   outline-offset: 3px;
 }
 ::selection {
@@ -166,7 +167,7 @@ a {
 
 /* ---------- Links & buttons ---------- */
 .link {
-  color: var(--c-tomato);
+  color: var(--c-tomato-text);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
@@ -180,16 +181,16 @@ a {
   text-decoration-color: var(--c-basil);
 }
 .link--quiet:hover {
-  color: var(--c-tomato);
+  color: var(--c-tomato-text);
 }
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.6em;
   padding: 0.85em 1.5em;
-  border: 1px solid var(--c-tomato);
+  border: 1px solid var(--c-tomato-text);
   border-radius: var(--radius);
-  background: var(--c-tomato);
+  background: var(--c-tomato-text);
   color: var(--c-paper);
   font-weight: 600;
   font-size: var(--step-0);

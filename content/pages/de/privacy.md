@@ -13,11 +13,11 @@ Eirik Falk, Anschrift siehe Impressum.
 
 ## Hosting
 
-Diese Website wird bei einem externen Dienstleister gehostet (Platzhalter: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA, oder GitHub Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA). Beim Aufruf der Seiten werden technisch notwendige Daten wie IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite und Browsertyp in Server-Logfiles verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO, das berechtigte Interesse an einer sicheren und stabilen Bereitstellung der Website. Mit dem Anbieter besteht ein Auftragsverarbeitungsvertrag.
+Diese Website wird über GitHub Pages gehostet, einen Dienst der GitHub Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA. Beim Aufruf der Seiten werden technisch notwendige Daten wie IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite und Browsertyp in Server-Logfiles verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO, das berechtigte Interesse an einer sicheren und stabilen Bereitstellung der Website. Mit dem Anbieter besteht ein Auftragsverarbeitungsvertrag.
 
 ## Reichweitenmessung
 
-Zur Auswertung der Besucherzahlen wird ein datenschutzfreundliches, cookiefreies Verfahren eingesetzt (Platzhalter: Vercel Web Analytics oder ein vergleichbarer Dienst). Es werden keine Cookies gesetzt und keine personenbezogenen Profile gebildet. IP-Adressen werden nicht gespeichert.
+Zur Auswertung der Besucherzahlen wird ein datenschutzfreundliches, cookiefreies Verfahren eingesetzt (Platzhalter: Dienst wird nachgetragen, sobald er eingerichtet ist). Es werden keine Cookies gesetzt und keine personenbezogenen Profile gebildet. IP-Adressen werden nicht gespeichert.
 
 ## Schriften
 

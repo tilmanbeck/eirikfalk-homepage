@@ -179,8 +179,16 @@ export const routes: Record<string, Record<Locale, string>> = {
   privacy: { de: '/de/datenschutz', en: '/en/privacy' },
 };
 
+/** Site base path without trailing slash ('' in production, '/eirikfalk-homepage' on the github.io preview). */
+export const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/** Prefix an absolute site path with the base path. */
+export function href(path: string) {
+  return `${base}${path}`;
+}
+
 export function route(key: keyof typeof routes, locale: Locale) {
-  return routes[key][locale];
+  return href(routes[key][locale]);
 }
 
 /** Pick the localized string, falling back to German. */
@@ -191,10 +199,11 @@ export function pick(field: { de: string; en?: string } | undefined, locale: Loc
 
 /** Map a path to its counterpart in the other locale. */
 export function alternatePath(path: string, from: Locale, to: Locale): string {
+  const bare = base && path.startsWith(base) ? path.slice(base.length) || '/' : path;
   for (const r of Object.values(routes)) {
-    if (r[from] === path) return r[to];
+    if (r[from] === bare) return href(r[to]);
   }
-  return routes.home[to];
+  return href(routes.home[to]);
 }
 
 export const site = {

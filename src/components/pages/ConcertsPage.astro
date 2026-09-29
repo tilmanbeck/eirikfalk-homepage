@@ -3,7 +3,7 @@ import { getEntry } from 'astro:content';
 import PageHeader from '../PageHeader.astro';
 import ConcertItem from '../ConcertItem.astro';
 import Lightbox from '../Lightbox.astro';
-import { useTranslations, pick, type Locale } from '../../i18n/ui';
+import { useTranslations, pick, href, type Locale } from '../../i18n/ui';
 import { upcomingConcerts, pastConcertsByYear } from '../../lib/concerts';
 
 interface Props {
@@ -34,8 +34,8 @@ const events = upcoming.map((c) => ({
 
 <div class="wrap">
   <p class="feeds small">
-    <a class="link" href={locale === 'de' ? '/konzerte.ics' : '/concerts.ics'}>{t('concerts.subscribe')}</a>
-    <a class="link link--quiet" href={locale === 'de' ? '/de/konzerte.xml' : '/en/concerts.xml'}>{t('concerts.rss')}</a>
+    <a class="link" href={href(locale === 'de' ? '/konzerte.ics' : '/concerts.ics')}>{t('concerts.subscribe')}</a>
+    <a class="link link--quiet" href={href(locale === 'de' ? '/de/konzerte.xml' : '/en/concerts.xml')}>{t('concerts.rss')}</a>
   </p>
 </div>
 

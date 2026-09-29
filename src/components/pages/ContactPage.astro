@@ -4,7 +4,7 @@ import { getEntry } from 'astro:content';
 import PageHeader from '../PageHeader.astro';
 import Obfuscated from '../Obfuscated.astro';
 import SocialLinks from '../SocialLinks.astro';
-import { useTranslations, site, type Locale } from '../../i18n/ui';
+import { useTranslations, site, href, type Locale } from '../../i18n/ui';
 import portrait1 from '../../assets/portraits/portrait-1.jpg';
 import portrait3 from '../../assets/portraits/portrait-3.jpg';
 
@@ -60,7 +60,7 @@ const press = [
             <div class="photo press__thumb">
               <Image src={p.img} alt={p.label} widths={[300, 600]} sizes="(max-width: 799px) 45vw, 18vw" />
             </div>
-            <a class="link small" href={p.file} download>{t('contact.download')}: {p.label}</a>
+            <a class="link small" href={href(p.file)} download>{t('contact.download')}: {p.label}</a>
           </li>
         ))
       }

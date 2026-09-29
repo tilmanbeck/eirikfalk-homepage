@@ -197,12 +197,12 @@ Rules: Cherry Tomato is never used for body text and never on Basil. Potting Soi
 | Layer | Choice | Reason |
 |---|---|---|
 | Framework | **Astro** | Zero JavaScript by default, built-in content collections with schema validation, built-in image optimisation (AVIF/WebP, responsive widths), built-in i18n routing, official Vercel adapter. Only the editor routes render on the server; everything else is prerendered. |
-| Content editing | **Keystatic** | Form-based editor on top of the Git repository, GitHub login, no database, no monthly cost, supports Astro. Files stay the source of truth, so GitHub web editing, a translation action and a future Telegram bot all keep working. |
+| Content editing | **Keystatic via Keystatic Cloud**, or GitHub web editing as fallback | Form-based editor on top of the Git repository. Keystatic's GitHub login needs a server, which Pages lacks; Keystatic Cloud provides it. Files stay the source of truth, so GitHub web editing, a translation action and a future bot all keep working. |
 | Styling | **Plain CSS with custom properties** | Few components, strong typographic design, hand-tunable, no build-tool coupling. Tokens for colour, type scale, spacing. |
 | Motion | CSS transitions + a small IntersectionObserver script | Matches the subtle-motion decision; no library. |
 | Fonts | Self-hosted woff2 | GDPR (no requests to Google Fonts). |
-| Hosting | **Vercel**, team DEVNULL (free Hobby tier) | Git push → build → deploy, preview URL per branch, CDN, SSL, custom domain, cookieless analytics. Known grey zone: Hobby terms say non-commercial; upgrade to Pro (20 USD/month) if Vercel objects or once the lessons page with pricing is integrated. Alternatives with equal capability: Netlify, Cloudflare Pages. |
-| Analytics | Vercel Web Analytics | Cookieless, no consent banner, page views and referrers. |
+| Hosting | **GitHub Pages** (decided 2026-09-29) | Push to main → GitHub Action builds with Astro → Pages deploys. Free, custom domain with HTTPS, portfolio use allowed by the terms. Requires a public repository on a free account. No per-branch preview URLs; review on the github.io address or locally. Vercel was the earlier plan; rejected because of the missing GitHub login connection and the Hobby-tier grey zone. |
+| Analytics | Cookieless third-party tool, e.g. GoatCounter or Cloudflare Web Analytics (to be chosen) | No consent banner; GitHub Pages has no built-in analytics. |
 | Translation | GitHub Action + Claude API | When a German content file is pushed without an English counterpart, generate the English file marked `translated: auto`. Hand-edited files are never regenerated. Same mechanism for Norwegian later. Needs one API key as a repository secret. Manual writing remains possible. |
 | Repository | GitHub, Tilman's account, Eirik as collaborator | Eirik needs a GitHub account (does not have one yet). Transfer to Eirik possible later. |
 

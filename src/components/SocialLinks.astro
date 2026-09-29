@@ -1,10 +1,10 @@
 ---
 /**
- * Row of profile links as small circular marks. Instagram uses the official glyph
- * from Simple Icons (build-time import, no client JS). Operabase and Muvac have no
- * public brand icons, so they get a typographic monogram in the same circle.
+ * Profile links: brand mark plus name, as a quiet text row.
+ * Instagram glyph from simple-icons; Operabase and Muvac marks from their own published SVGs.
  */
 import { siInstagram } from 'simple-icons';
+import { muvac, operabase } from '../assets/brands/marks';
 import { useTranslations, site, type Locale } from '../i18n/ui';
 
 interface Props {
@@ -18,22 +18,29 @@ const t = useTranslations(locale);
 <ul class:list={['social', cls]} aria-label={t('social.label')}>
   <li>
     <a class="social__link" href={site.instagram} rel="me noopener" target="_blank">
-      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <svg class="social__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path fill="currentColor" d={siInstagram.path}></path>
       </svg>
-      <span class="sr-only">{t('social.instagram')}</span>
+      <span class="social__name">Instagram</span>
+      <span class="sr-only">, {t('social.opens')}</span>
     </a>
   </li>
   <li>
     <a class="social__link" href={site.operabase} rel="noopener" target="_blank">
-      <span class="social__mono" aria-hidden="true">Ob</span>
-      <span class="sr-only">{t('social.operabase')}</span>
+      <svg class="social__mark" viewBox={operabase.viewBox} aria-hidden="true" focusable="false">
+        <path fill="none" stroke="currentColor" stroke-width={operabase.strokeWidth} stroke-miterlimit="10" d={operabase.path}></path>
+      </svg>
+      <span class="social__name">Operabase</span>
+      <span class="sr-only">, {t('social.opens')}</span>
     </a>
   </li>
   <li>
     <a class="social__link" href={site.muvac} rel="noopener" target="_blank">
-      <span class="social__mono" aria-hidden="true">Mv</span>
-      <span class="sr-only">{t('social.muvac')}</span>
+      <svg class="social__mark" viewBox={muvac.viewBox} aria-hidden="true" focusable="false">
+        <path fill="currentColor" d={muvac.path}></path>
+      </svg>
+      <span class="social__name">Muvac</span>
+      <span class="sr-only">, {t('social.opens')}</span>
     </a>
   </li>
 </ul>
@@ -44,36 +51,40 @@ const t = useTranslations(locale);
     margin: 0;
     padding: 0;
     display: flex;
-    gap: var(--space-xs);
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-l);
   }
   .social__link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border: 1px solid var(--c-basil);
-    border-radius: 50%;
-    color: var(--c-soil);
-    transition:
-      background 0.2s var(--ease-out),
-      border-color 0.2s var(--ease-out),
-      color 0.2s var(--ease-out);
+    gap: 0.55em;
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--c-soil-soft);
+    padding-block: 0.3em;
+    transition: color 0.2s var(--ease-out);
+  }
+  .social__mark {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: none;
+  }
+  .social__name {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color 0.2s var(--ease-out);
   }
   .social__link:hover {
-    background: var(--c-basil);
-    border-color: var(--c-basil);
-    color: var(--c-paper);
+    color: var(--c-soil);
   }
-  .social__mono {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    transform: translateY(-1px);
+  .social__link:hover .social__name {
+    text-decoration-color: var(--c-tomato-text);
   }
   @media (prefers-reduced-motion: reduce) {
-    .social__link {
+    .social__link,
+    .social__name {
       transition: none;
     }
   }

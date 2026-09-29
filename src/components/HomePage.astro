@@ -57,7 +57,7 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
 </section>
 
 <!-- Intro: single narrow column. -->
-<section class="section intro">
+<section class="section intro" id="ueber">
   <div class="wrap">
     <div class="intro__inner reveal">
       <p class="intro__text">{page.data.intro}</p>
@@ -67,7 +67,7 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
 </section>
 
 <!-- Concerts: date-led list with hairlines, or an empty state. -->
-<section class="section section--tight concerts">
+<section class="section section--tight concerts" id="konzerte">
   <div class="wrap">
     <div class="concerts__head reveal">
       <h2 class="concerts__heading">{t('concerts.heading')}</h2>
@@ -112,7 +112,7 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
 </section>
 
 <!-- Services: one Basil section. Two text columns on the left, photo-led lessons column on the right. -->
-<section class="section section--basil services">
+<section class="section section--basil services" id="leistungen">
   <div class="wrap services__grid">
     <h2 class="services__heading reveal">{t('services.heading')}</h2>
 

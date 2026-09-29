@@ -8,7 +8,8 @@
   /* Palette: web approximations of Pantone TCX, see PROJECT_SPEC.md */
   --c-paper: #f4f2ec;        /* page background, faint sage tint */
   --c-paper-deep: #ebe8df;   /* subtle surfaces on paper */
-  --c-basil: #879f84;        /* 16-6216 TCX Basil */
+  --c-basil: #879f84;        /* 16-6216 TCX Basil: hero block, hairlines, hover fills */
+  --c-basil-section: #93aa90; /* slightly lighter Basil for full-bleed sections so body text reaches 4.6:1 */
   --c-basil-deep: #6f8a6c;   /* hover / hairlines on basil */
   --c-basil-tint: #e3e8df;   /* very light basil for hairlines on paper */
   --c-soil: #54301a;         /* 19-1218 TCX Potting Soil, all text */
@@ -121,7 +122,7 @@ a {
   padding-block: var(--space-xl);
 }
 .section--basil {
-  background: var(--c-basil);
+  background: var(--c-basil-section);
 }
 .hairline {
   border: 0;

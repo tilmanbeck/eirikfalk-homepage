@@ -98,7 +98,7 @@ const teaching = (await getCollection('testimonials', ({ data }) => data.context
                   <span class="rep__composer small">{r.data.composer}</span>
                   <span class="rep__work">
                     {r.data.work}
-                    {r.data.role && <span class="rep__role muted"> · {r.data.role}</span>}
+                    {r.data.role && <span class="rep__role"> · {r.data.role}</span>}
                   </span>
                 </li>
               ))}
@@ -234,13 +234,9 @@ const teaching = (await getCollection('testimonials', ({ data }) => data.context
     padding-block: 0.45rem;
     border-top: 1px solid var(--c-basil-deep);
   }
-  .rep__composer {
-    color: var(--c-soil);
-    opacity: 0.85;
-  }
+  .rep__composer,
   .rep__role {
     color: var(--c-soil);
-    opacity: 0.8;
   }
   .voices {
     display: grid;

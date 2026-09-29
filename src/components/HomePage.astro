@@ -4,6 +4,8 @@ import { getCollection, getEntry } from 'astro:content';
 import { useTranslations, route, pick, site, type Locale } from '../i18n/ui';
 import Obfuscated from './Obfuscated.astro';
 import SocialLinks from './SocialLinks.astro';
+import ConcertItem from './ConcertItem.astro';
+import { upcomingConcerts } from '../lib/concerts';
 import portrait from '../assets/portraits/portrait-1.jpg';
 import pianoRoom from '../assets/piano-room.jpg';
 
@@ -15,19 +17,26 @@ const t = useTranslations(locale);
 const page = await getEntry('pages', `${locale}/home`);
 if (!page) throw new Error(`Missing content/pages/${locale}/home.md`);
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-const upcoming = (await getCollection('concerts', ({ data }) => data.date >= today))
-  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
-  .slice(0, 3);
+const upcoming = await upcomingConcerts(3);
 
-const testimonial = (await getCollection('testimonials', ({ data }) => data.context === 'teaching')).sort(
-  (a, b) => Number(b.data.featured) - Number(a.data.featured),
-)[0];
+// Prefer a quote about singing once one exists; until then show a teaching review, labelled as such.
+const all = await getCollection('testimonials');
+const testimonial =
+  all.filter((q) => q.data.context === 'singing').sort((a, b) => Number(b.data.featured) - Number(a.data.featured))[0] ??
+  all.filter((q) => q.data.context === 'teaching').sort((a, b) => Number(b.data.featured) - Number(a.data.featured))[0];
+const testimonialLabel = testimonial?.data.context === 'singing' ? t('references.voices') : t('testimonial.note');
 
-const fmtDay = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit' });
-const fmtMonth = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', { month: 'short', year: 'numeric' });
-const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', { weekday: 'long' });
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Eirik Falk',
+  jobTitle: locale === 'de' ? 'Tenor' : 'Tenor',
+  description: page.data.description,
+  url: (Astro.site ?? new URL('https://eirikfalk.de')).toString(),
+  address: { '@type': 'PostalAddress', addressLocality: 'Darmstadt', addressCountry: 'DE' },
+  sameAs: [site.instagram, site.operabase, site.muvac, site.lessons],
+  alumniOf: ['Akademie für Tonkunst Darmstadt', 'Hochschule für Kirchenmusik Bayreuth'],
+};
 ---
 
 <!-- Hero: asymmetric split. Portrait at column width (source is ~1100px), name and tagline beside it. -->
@@ -84,28 +93,7 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
       ) : (
         <ol class="concerts__list">
           {upcoming.map((c, i) => (
-            <li class="concert reveal" style={`--delay:${i * 80}ms`}>
-              <time class="concert__date" datetime={c.data.date.toISOString().slice(0, 10)}>
-                <span class="concert__day">{fmtDay.format(c.data.date)}</span>
-                <span class="concert__month">{fmtMonth.format(c.data.date)}</span>
-                <span class="concert__weekday small muted">
-                  {fmtWeekday.format(c.data.date)}
-                  {c.data.time && `, ${c.data.time}`}
-                </span>
-              </time>
-              <div class="concert__body">
-                <h3 class="concert__title">{pick(c.data.title, locale)}</h3>
-                {c.data.role && <p class="concert__role">{pick(c.data.role, locale)}</p>}
-                <p class="concert__place muted">{c.data.place}</p>
-              </div>
-              <div class="concert__aside">
-                {c.data.link && (
-                  <a class="link" href={c.data.link} rel="noopener" target="_blank">
-                    {t('concerts.tickets')}
-                  </a>
-                )}
-              </div>
-            </li>
+            <ConcertItem concert={c} locale={locale} index={i} />
           ))}
         </ol>
       )
@@ -157,8 +145,8 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
             <p>„{pick(testimonial.data.quote, locale)}“</p>
           </blockquote>
           <figcaption class="small muted">
-            {t('testimonial.note')}
-            {testimonial.data.author && `, ${testimonial.data.author}`}
+            {testimonial.data.author ?? testimonialLabel}
+            {testimonial.data.author && testimonial.data.source && `, ${testimonial.data.source}`}
           </figcaption>
         </figure>
       </div>
@@ -185,6 +173,7 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
     </dl>
   </div>
 </section>
+<script type="application/ld+json" set:html={JSON.stringify(person)} />
 
 <style>
   /* ---- Hero ---- */
@@ -280,42 +269,6 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-  .concert {
-    display: grid;
-    grid-template-columns: 9rem 1fr auto;
-    gap: var(--space-m) var(--space-l);
-    padding-block: var(--space-m);
-    border-top: 1px solid var(--c-basil-tint);
-    align-items: start;
-  }
-  .concert:last-child {
-    border-bottom: 1px solid var(--c-basil-tint);
-  }
-  .concert__date {
-    display: grid;
-    line-height: 1.1;
-  }
-  .concert__day {
-    font-family: var(--font-display);
-    font-weight: var(--display-weight);
-    font-size: var(--step-4);
-    line-height: 0.9;
-    color: var(--c-tomato);
-  }
-  .concert__month {
-    margin-top: 0.3rem;
-    font-weight: 600;
-  }
-  .concert__weekday {
-    margin-top: 0.2rem;
-  }
-  .concert__title {
-    font-size: var(--step-2);
-    margin-bottom: 0.25rem;
-  }
-  .concert__role {
-    font-weight: 500;
   }
   .concerts__empty {
     padding: var(--space-xl) 0;
@@ -442,12 +395,6 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
     }
     .intro__inner {
       margin-left: 0;
-    }
-    .concert {
-      grid-template-columns: 5.5rem 1fr;
-    }
-    .concert__aside {
-      grid-column: 2;
     }
     .services__grid {
       grid-template-columns: 1fr;

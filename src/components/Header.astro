@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import { useTranslations, route, alternatePath, type Locale } from '../i18n/ui';
 const locale = (Astro.currentLocale ?? 'de') as Locale;
 const t = useTranslations(locale);
@@ -6,11 +7,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const other: Locale = locale === 'de' ? 'en' : 'de';
 const switchHref = alternatePath(path, locale, other);
 
+const hasMedia = (await getCollection('media')).length > 0;
 const items = [
   { key: 'about', label: t('nav.about') },
   { key: 'services', label: t('nav.services') },
   { key: 'concerts', label: t('nav.concerts') },
   { key: 'references', label: t('nav.references') },
+  ...(hasMedia ? [{ key: 'media', label: t('nav.media') }] : []),
   { key: 'contact', label: t('nav.contact') },
 ] as const;
 ---

@@ -1,0 +1,177 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import PageHeader from '../PageHeader.astro';
+import { useTranslations, route, type Locale } from '../../i18n/ui';
+import performance from '../../assets/performance-1.jpg';
+import portrait from '../../assets/portraits/portrait-2.jpg';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const page = await getEntry('pages', `${locale}/about`);
+if (!page) throw new Error(`Missing content/pages/${locale}/about.md`);
+const { Content } = await render(page);
+
+const groups = [
+  { key: 'about.education', items: page.data.education ?? [] },
+  { key: 'about.teachers', items: page.data.teachers ?? [] },
+  { key: 'about.masterclasses', items: page.data.masterclasses ?? [] },
+  { key: 'about.awards', items: page.data.awards ?? [] },
+].filter((g) => g.items.length > 0) as { key: any; items: { title: string; detail?: string; year?: string }[] }[];
+---
+
+<PageHeader title={page.data.title} tagline={page.data.tagline} />
+
+<!-- Bio beside the performance photo -->
+<section class="section section--tight about">
+  <div class="wrap about__grid">
+    <figure class="about__figure reveal">
+      <div class="photo about__photo">
+        <Image
+          src={performance}
+          alt={locale === 'de' ? 'Eirik Falk im Konzert mit Chor und Orchester' : 'Eirik Falk in concert with choir and orchestra'}
+          widths={[640, 960, 1365, 2000]}
+          sizes="(max-width: 799px) 100vw, 58vw"
+          loading="eager"
+        />
+      </div>
+      <figcaption class="small muted">{locale === 'de' ? 'Konzert, Foto: Nachweis folgt' : 'Concert, photo credit to follow'}</figcaption>
+    </figure>
+    <div class="about__text prose reveal" style="--delay:80ms">
+      <Content />
+      <p class="about__cta">
+        <a class="btn" href={route('contact', locale)}>{t('cta.contact')} <span class="arrow" aria-hidden="true">→</span></a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Structured CV -->
+{
+  groups.length > 0 && (
+    <section class="section section--basil cv">
+      <div class="wrap cv__grid">
+        <div class="cv__side reveal">
+          <h2 class="cv__heading">{t('about.cv')}</h2>
+          <div class="photo cv__portrait">
+            <Image src={portrait} alt="" widths={[400, 800]} sizes="(max-width: 799px) 60vw, 22vw" />
+          </div>
+        </div>
+        <div class="cv__groups">
+          {groups.map((g, gi) => (
+            <div class="cv__group reveal" style={`--delay:${gi * 80}ms`}>
+              <h3 class="cv__groupTitle">{t(g.key)}</h3>
+              <ul class="cv__list">
+                {g.items.map((it) => (
+                  <li class="cv__item">
+                    <span class="cv__year small">{it.year}</span>
+                    <span class="cv__body">
+                      <span class="cv__title">{it.title}</span>
+                      {it.detail && <span class="cv__detail small">{it.detail}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .about__grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .about__figure {
+    margin: 0;
+  }
+  .about__photo {
+    aspect-ratio: 3 / 2;
+  }
+  .about__figure figcaption {
+    margin-top: 0.5rem;
+  }
+  .about__text :global(p) {
+    font-size: var(--step-0);
+    line-height: 1.65;
+  }
+  .about__text :global(p + p) {
+    margin-top: 1em;
+  }
+  .about__text :global(em) {
+    color: var(--c-soil-soft);
+  }
+  .about__cta {
+    margin-top: var(--space-l);
+  }
+
+  .cv__grid {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .cv__heading {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-m);
+  }
+  .cv__portrait {
+    aspect-ratio: 3 / 4;
+    max-width: 18rem;
+  }
+  .cv__groups {
+    display: grid;
+    gap: var(--space-l);
+  }
+  .cv__group + .cv__group {
+    padding-top: var(--space-l);
+    border-top: 1px solid var(--c-basil-deep);
+  }
+  .cv__groupTitle {
+    font-size: var(--step-2);
+    margin-bottom: var(--space-s);
+  }
+  .cv__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-s);
+  }
+  .cv__item {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--space-m);
+  }
+  .cv__body {
+    display: grid;
+  }
+  .cv__title {
+    font-weight: 600;
+  }
+  .cv__year {
+    padding-top: 0.2em;
+  }
+  @media (max-width: 799px) {
+    .about__grid,
+    .cv__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+    .cv__portrait {
+      display: none;
+    }
+    .cv__item {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+</style>

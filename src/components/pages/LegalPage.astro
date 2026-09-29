@@ -1,0 +1,37 @@
+---
+import { getEntry, render } from 'astro:content';
+import PageHeader from '../PageHeader.astro';
+import type { Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  page: 'imprint' | 'privacy';
+}
+const { locale, page: key } = Astro.props;
+const page = await getEntry('pages', `${locale}/${key}`);
+if (!page) throw new Error(`Missing content/pages/${locale}/${key}.md`);
+const { Content } = await render(page);
+---
+
+<PageHeader title={page.data.title} />
+<section class="section section--tight">
+  <div class="wrap">
+    <div class="legal prose">
+      <Content />
+    </div>
+  </div>
+</section>
+
+<style>
+  .legal :global(h2) {
+    font-size: var(--step-2);
+    margin: var(--space-l) 0 var(--space-s);
+  }
+  .legal :global(p) {
+    margin-bottom: 1em;
+    white-space: pre-line;
+  }
+  .legal :global(em) {
+    color: var(--c-tomato-text);
+  }
+</style>

@@ -1,0 +1,151 @@
+---
+import { getEntry } from 'astro:content';
+import PageHeader from '../PageHeader.astro';
+import ConcertItem from '../ConcertItem.astro';
+import Lightbox from '../Lightbox.astro';
+import { useTranslations, pick, type Locale } from '../../i18n/ui';
+import { upcomingConcerts, pastConcertsByYear } from '../../lib/concerts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const page = await getEntry('pages', `${locale}/concerts`);
+if (!page) throw new Error(`Missing content/pages/${locale}/concerts.md`);
+const upcoming = await upcomingConcerts();
+const past = await pastConcertsByYear();
+const site = Astro.site ?? new URL('https://eirikfalk.de');
+
+// Structured data for the upcoming concerts
+const events = upcoming.map((c) => ({
+  '@context': 'https://schema.org',
+  '@type': 'MusicEvent',
+  name: pick(c.data.title, locale),
+  startDate: c.data.time ? `${c.data.date.toISOString().slice(0, 10)}T${c.data.time}:00+01:00` : c.data.date.toISOString().slice(0, 10),
+  location: { '@type': 'Place', name: c.data.place },
+  performer: { '@type': 'Person', name: 'Eirik Falk' },
+  url: c.data.link ?? new URL(locale === 'de' ? '/de/konzerte' : '/en/concerts', site).toString(),
+  ...(c.data.image ? { image: new URL(c.data.image.src, site).toString() } : {}),
+}));
+---
+
+<PageHeader title={page.data.title} tagline={page.data.tagline} />
+
+<div class="wrap">
+  <p class="feeds small">
+    <a class="link" href={locale === 'de' ? '/konzerte.ics' : '/concerts.ics'}>{t('concerts.subscribe')}</a>
+    <a class="link link--quiet" href={locale === 'de' ? '/de/konzerte.xml' : '/en/concerts.xml'}>{t('concerts.rss')}</a>
+  </p>
+</div>
+
+<section class="section section--tight">
+  <div class="wrap">
+    <h2 class="h2 reveal">{t('concerts.upcoming')}</h2>
+    {
+      upcoming.length === 0 ? (
+        <div class="empty reveal">
+          <p class="display empty__title">{t('concerts.empty')}</p>
+          <p class="muted">{t('concerts.emptyHint')}</p>
+        </div>
+      ) : (
+        <ol class="list">
+          {upcoming.map((c, i) => (
+            <ConcertItem concert={c} locale={locale} index={i} />
+          ))}
+        </ol>
+      )
+    }
+  </div>
+</section>
+
+{
+  past.length > 0 && (
+    <section class="section section--tight past">
+      <div class="wrap">
+        <h2 class="h2 reveal">{t('concerts.past')}</h2>
+        {past.map(([year, list], yi) => (
+          <details class="year reveal" open={yi === 0}>
+            <summary class="year__summary">
+              <span class="year__label display">{year}</span>
+              <span class="year__count small muted">{list.length}</span>
+            </summary>
+            <ol class="list">
+              {list.map((c, i) => (
+                <ConcertItem concert={c} locale={locale} past index={i} />
+              ))}
+            </ol>
+          </details>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<Lightbox />
+{events.length > 0 && <script type="application/ld+json" set:html={JSON.stringify(events)} />}
+
+<style>
+  .feeds {
+    display: flex;
+    gap: var(--space-m);
+    padding-bottom: var(--space-l);
+    border-bottom: 1px solid var(--c-basil-tint);
+  }
+  .h2 {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-l);
+  }
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .empty {
+    padding: var(--space-xl) 0;
+    border-block: 1px solid var(--c-basil-tint);
+  }
+  .empty__title {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-xs);
+  }
+  .past {
+    background: var(--c-paper-deep);
+  }
+  .year + .year {
+    margin-top: var(--space-m);
+  }
+  .year__summary {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-s);
+    cursor: pointer;
+    list-style: none;
+    padding-block: var(--space-xs);
+  }
+  .year__summary::-webkit-details-marker {
+    display: none;
+  }
+  .year__summary::before {
+    content: '+';
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    color: var(--c-tomato-text);
+    width: 1em;
+  }
+  .year[open] .year__summary::before {
+    content: '−';
+  }
+  .year__label {
+    font-size: var(--step-3);
+  }
+  .year .list {
+    margin-top: var(--space-s);
+    margin-left: calc(1em + var(--space-s));
+  }
+  @media (max-width: 799px) {
+    .year .list {
+      margin-left: 0;
+    }
+  }
+</style>

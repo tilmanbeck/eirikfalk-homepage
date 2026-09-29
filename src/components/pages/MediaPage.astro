@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, getEntry } from 'astro:content';
+import PageHeader from '../PageHeader.astro';
+import Lightbox from '../Lightbox.astro';
+import Embed from '../Embed.astro';
+import { useTranslations, pick, type Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const page = await getEntry('pages', `${locale}/media`);
+if (!page) throw new Error(`Missing content/pages/${locale}/media.md`);
+const items = (await getCollection('media')).sort((a, b) => a.data.order - b.data.order);
+const photos = items.filter((m) => m.data.kind === 'photo');
+const av = items.filter((m) => m.data.kind !== 'photo');
+---
+
+<PageHeader title={page.data.title} tagline={page.data.tagline} />
+
+<section class="section section--tight">
+  <div class="wrap">
+    <h2 class="h2 reveal">{t('media.listen')}</h2>
+    {
+      av.length === 0 ? (
+        <p class="muted empty reveal">{t('media.empty')}</p>
+      ) : (
+        <div class="av">
+          {av.map((m) => (
+            <figure class="av__item reveal">
+              <Embed url={m.data.embedUrl!} title={pick(m.data.title, locale)} poster={m.data.image} locale={locale} />
+              <figcaption class="small">{pick(m.data.title, locale)}</figcaption>
+            </figure>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+{
+  photos.length > 0 && (
+    <section class="section section--tight">
+      <div class="wrap">
+        <h2 class="h2 reveal">{t('media.photos')}</h2>
+        <ul class="grid">
+          {photos.map((m, i) => (
+            <li class="grid__item reveal" style={`--delay:${(i % 4) * 60}ms`}>
+              <a
+                class="photo grid__link"
+                href={m.data.image!.src}
+                data-lightbox
+                data-alt={m.data.alt ? pick(m.data.alt, locale) : pick(m.data.title, locale)}
+                data-caption={[pick(m.data.title, locale), m.data.credit ? `${t('media.credit')}: ${m.data.credit}` : ''].filter(Boolean).join(' · ')}
+              >
+                <Image src={m.data.image!} alt={m.data.alt ? pick(m.data.alt, locale) : pick(m.data.title, locale)} widths={[400, 700, 1000]} sizes="(max-width: 799px) 50vw, 25vw" />
+              </a>
+              {m.data.credit && <p class="small muted grid__credit">{t('media.credit')}: {m.data.credit}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<Lightbox />
+
+<style>
+  .h2 {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-l);
+  }
+  .empty {
+    padding: var(--space-l) 0;
+    border-block: 1px solid var(--c-basil-tint);
+  }
+  .av {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-l);
+  }
+  .av__item {
+    margin: 0;
+  }
+  .av__item figcaption {
+    margin-top: 0.5rem;
+  }
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-m);
+  }
+  .grid__link {
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+  }
+  .grid__link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .grid__link:hover img {
+    transform: scale(1.03);
+  }
+  .grid__credit {
+    margin-top: 0.4rem;
+  }
+  @media (max-width: 799px) {
+    .av,
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .av {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .grid__link img {
+      transition: none;
+    }
+  }
+</style>

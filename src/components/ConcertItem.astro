@@ -1,0 +1,136 @@
+---
+import { Image } from 'astro:assets';
+import { useTranslations, pick, type Locale } from '../i18n/ui';
+import { formatters, type Concert } from '../lib/concerts';
+
+interface Props {
+  concert: Concert;
+  locale: Locale;
+  past?: boolean;
+  index?: number;
+}
+const { concert: c, locale, past = false, index = 0 } = Astro.props;
+const t = useTranslations(locale);
+const f = formatters(locale);
+const iso = c.data.date.toISOString().slice(0, 10);
+---
+
+<li class:list={['concert', 'reveal', { 'concert--past': past }]} style={`--delay:${Math.min(index, 6) * 60}ms`}>
+  <time class="concert__date" datetime={iso}>
+    <span class="concert__day">{f.day.format(c.data.date)}</span>
+    <span class="concert__month">{f.month.format(c.data.date)}</span>
+    {
+      !past && (
+        <span class="concert__weekday small muted">{f.weekday.format(c.data.date) + (c.data.time ? `, ${c.data.time}` : '')}</span>
+      )
+    }
+  </time>
+  <div class="concert__body">
+    <h3 class="concert__title">{pick(c.data.title, locale)}</h3>
+    {c.data.role && <p class="concert__role">{pick(c.data.role, locale)}</p>}
+    <p class="concert__place muted">{c.data.place}</p>
+    {c.data.note && <p class="concert__note small">{pick(c.data.note, locale)}</p>}
+    <p class="concert__actions small">
+      {
+        c.data.link && (
+          <a class="link" href={c.data.link} rel="noopener" target="_blank">
+            {t('concerts.tickets')}
+          </a>
+        )
+      }
+      {!past && <a class="link link--quiet" href={`/ics/${c.id}.ics`} download>{t('concerts.addToCalendar')}</a>}
+    </p>
+  </div>
+  {
+    c.data.image && (
+      <a
+        class="concert__flyer photo"
+        href={c.data.image.src}
+        data-lightbox
+        data-alt={c.data.imageAlt ? pick(c.data.imageAlt, locale) : pick(c.data.title, locale)}
+        data-caption={pick(c.data.title, locale)}
+        aria-label={t('concerts.flyer')}
+      >
+        <Image src={c.data.image} alt={c.data.imageAlt ? pick(c.data.imageAlt, locale) : ''} widths={[240, 480]} sizes="160px" />
+      </a>
+    )
+  }
+</li>
+
+<style>
+  .concert {
+    display: grid;
+    grid-template-columns: 9rem 1fr auto;
+    gap: var(--space-m) var(--space-l);
+    padding-block: var(--space-m);
+    border-top: 1px solid var(--c-basil-tint);
+    align-items: start;
+  }
+  .concert:last-child {
+    border-bottom: 1px solid var(--c-basil-tint);
+  }
+  .concert__date {
+    display: grid;
+    line-height: 1.1;
+  }
+  .concert__day {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--step-4);
+    line-height: 0.9;
+    color: var(--c-tomato);
+  }
+  .concert--past .concert__day {
+    color: var(--c-soil-soft);
+    font-size: var(--step-3);
+  }
+  .concert__month {
+    margin-top: 0.3rem;
+    font-weight: 600;
+  }
+  .concert__weekday {
+    margin-top: 0.2rem;
+  }
+  .concert__title {
+    font-size: var(--step-2);
+    margin-bottom: 0.25rem;
+  }
+  .concert--past .concert__title {
+    font-size: var(--step-1);
+  }
+  .concert__role {
+    font-weight: 500;
+  }
+  .concert__note {
+    margin-top: 0.5rem;
+    max-width: 60ch;
+  }
+  .concert__actions {
+    margin-top: 0.6rem;
+    display: flex;
+    gap: var(--space-m);
+    flex-wrap: wrap;
+  }
+  .concert__actions:empty {
+    display: none;
+  }
+  .concert__flyer {
+    width: 7rem;
+    aspect-ratio: 3 / 4;
+    display: block;
+    overflow: hidden;
+  }
+  .concert__flyer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 799px) {
+    .concert {
+      grid-template-columns: 5.5rem 1fr;
+    }
+    .concert__flyer {
+      grid-column: 2;
+    }
+  }
+</style>

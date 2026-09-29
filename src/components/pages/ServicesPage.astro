@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import PageHeader from '../PageHeader.astro';
+import { useTranslations, route, site, type Locale } from '../../i18n/ui';
+import pianoRoom from '../../assets/piano-room.jpg';
+import performanceBw from '../../assets/performance-2-bw.jpg';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const page = await getEntry('pages', `${locale}/services`);
+if (!page) throw new Error(`Missing content/pages/${locale}/services.md`);
+const paras = (s?: string) => (s ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+---
+
+<PageHeader title={page.data.title} tagline={page.data.tagline} />
+
+<div class="wrap">
+  <nav class="jump small" aria-label={locale === 'de' ? 'Abschnitte' : 'Sections'}>
+    <a class="link link--quiet" href="#solist">{t('services.solo')}</a>
+    <a class="link link--quiet" href="#chorist">{t('services.choir')}</a>
+    <a class="link link--quiet" href="#gesangsunterricht">{t('services.lessons')}</a>
+  </nav>
+</div>
+
+<section class="section section--tight service" id="solist">
+  <div class="wrap service__grid">
+    <div class="service__text reveal">
+      <p class="label">{t('services.solo.lead')}</p>
+      <h2 class="service__title">{t('services.solo')}</h2>
+      {paras(page.data.solo).map((p) => <p class="service__para">{p}</p>)}
+      <a class="btn" href={route('contact', locale)}>{t('cta.contact')} <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section section--basil service service--photo" id="chorist">
+  <div class="wrap service__grid service__grid--split">
+    <div class="service__text reveal">
+      <p class="label label--onbasil">{t('services.choir.lead')}</p>
+      <h2 class="service__title">{t('services.choir')}</h2>
+      {paras(page.data.choir).map((p) => <p class="service__para">{p}</p>)}
+      <a class="btn btn--ghost" href={route('contact', locale)}>{t('cta.contact')} <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+    <div class="photo service__photo reveal" style="--delay:80ms">
+      <Image src={performanceBw} alt={locale === 'de' ? 'Chor im Konzert' : 'Choir in concert'} widths={[640, 960, 1400]} sizes="(max-width: 799px) 100vw, 45vw" />
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight service" id="gesangsunterricht">
+  <div class="wrap service__grid service__grid--split service__grid--reverse">
+    <div class="service__text reveal">
+      <p class="label">{t('services.lessons.lead')}</p>
+      <h2 class="service__title">{t('services.lessons')}</h2>
+      {paras(page.data.lessons).map((p) => <p class="service__para">{p}</p>)}
+      <a class="btn btn--ghost" href={site.lessons} rel="noopener" target="_blank">{t('services.lessonsLink')} <span class="arrow" aria-hidden="true">↗</span></a>
+    </div>
+    <div class="photo service__photo service__photo--tall reveal" style="--delay:80ms">
+      <Image src={pianoRoom} alt={locale === 'de' ? 'Unterrichtsraum mit E-Piano und Gitarre' : 'Teaching room with electric piano and guitar'} widths={[480, 720, 960]} sizes="(max-width: 799px) 100vw, 36vw" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .jump {
+    display: flex;
+    gap: var(--space-m);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-l);
+    border-bottom: 1px solid var(--c-basil-tint);
+  }
+  .service__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .service__grid--split {
+    grid-template-columns: 6fr 6fr;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+  .service__grid--reverse .service__text {
+    order: 2;
+  }
+  .service__text {
+    max-width: var(--measure);
+  }
+  .service__title {
+    font-size: var(--step-4);
+    margin: 0.3rem 0 var(--space-m);
+  }
+  .service__para {
+    margin-bottom: 1em;
+    text-wrap: pretty;
+  }
+  .service__text .btn {
+    margin-top: var(--space-s);
+  }
+  .service__photo {
+    aspect-ratio: 4 / 3;
+  }
+  .service__photo--tall {
+    aspect-ratio: 3 / 4;
+    max-width: 26rem;
+    justify-self: start;
+  }
+  .label--onbasil {
+    color: var(--c-soil);
+  }
+  .service--photo .btn--ghost:hover {
+    background: var(--c-soil);
+    color: var(--c-paper);
+  }
+  @media (max-width: 799px) {
+    .service__grid--split {
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+    .service__grid--reverse .service__text {
+      order: 0;
+    }
+    .service__photo--tall {
+      max-width: 100%;
+    }
+  }
+</style>

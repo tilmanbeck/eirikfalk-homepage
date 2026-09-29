@@ -1,0 +1,166 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import PageHeader from '../PageHeader.astro';
+import Obfuscated from '../Obfuscated.astro';
+import SocialLinks from '../SocialLinks.astro';
+import { useTranslations, site, type Locale } from '../../i18n/ui';
+import portrait1 from '../../assets/portraits/portrait-1.jpg';
+import portrait3 from '../../assets/portraits/portrait-3.jpg';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const page = await getEntry('pages', `${locale}/contact`);
+if (!page) throw new Error(`Missing content/pages/${locale}/contact.md`);
+const press = [
+  { img: portrait1, file: '/press/eirik-falk-portrait-1.jpg', label: locale === 'de' ? 'Porträt, Farbe' : 'Portrait, colour' },
+  { img: portrait3, file: '/press/eirik-falk-portrait-3.jpg', label: locale === 'de' ? 'Porträt, Schwarzweiß' : 'Portrait, black and white' },
+];
+---
+
+<PageHeader title={page.data.title} tagline={page.data.tagline} />
+
+<section class="section section--tight">
+  <div class="wrap contact">
+    <dl class="contact__list reveal">
+      <div>
+        <dt class="label">{t('contact.email')}</dt>
+        <dd><Obfuscated kind="email" value={site.email} class="link contact__link" /></dd>
+      </div>
+      <div>
+        <dt class="label">{t('contact.phone')}</dt>
+        <dd><Obfuscated kind="phone" value={site.phone} display={site.phoneDisplay} class="link contact__link" /></dd>
+      </div>
+    </dl>
+    <div class="contact__aside reveal" style="--delay:80ms">
+      <p class="muted">{t('contact.text')}</p>
+      <p class="muted small contact__where">Darmstadt, Rhein-Main</p>
+      <SocialLinks locale={locale} class="contact__social" />
+    </div>
+  </div>
+</section>
+
+<section class="section section--basil press" id="presse">
+  <div class="wrap press__grid">
+    <div class="press__text reveal">
+      <h2 class="h2">{t('contact.press')}</h2>
+      <p class="press__intro">{t('contact.pressIntro')}</p>
+      <div class="press__bio">
+        <p id="press-bio">{page.data.pressBio}</p>
+        <button class="btn btn--ghost press__copy" type="button" data-copy="#press-bio" data-done={t('contact.copied')}>{t('contact.copy')}</button>
+      </div>
+    </div>
+    <ul class="press__photos">
+      {
+        press.map((p, i) => (
+          <li class="press__photo reveal" style={`--delay:${i * 80}ms`}>
+            <div class="photo press__thumb">
+              <Image src={p.img} alt={p.label} widths={[300, 600]} sizes="(max-width: 799px) 45vw, 18vw" />
+            </div>
+            <a class="link small" href={p.file} download>{t('contact.download')}: {p.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('button[data-copy]').forEach((b) => {
+    b.addEventListener('click', async () => {
+      const el = document.querySelector(b.dataset.copy ?? '');
+      if (!el) return;
+      try {
+        await navigator.clipboard.writeText(el.textContent?.trim() ?? '');
+        const old = b.textContent;
+        b.textContent = b.dataset.done ?? old;
+        setTimeout(() => (b.textContent = old), 1600);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .contact__list {
+    margin: 0;
+    display: grid;
+    gap: var(--space-l);
+  }
+  .contact__list dd {
+    margin: 0.25rem 0 0;
+  }
+  .contact__link {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: 1.15;
+    word-break: break-word;
+  }
+  .contact__where {
+    margin-top: 0.5rem;
+  }
+  .contact__social {
+    margin-top: var(--space-l);
+  }
+  .h2 {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-s);
+  }
+  .press__grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .press__intro {
+    max-width: 48ch;
+    margin-bottom: var(--space-m);
+  }
+  .press__bio {
+    padding: var(--space-m);
+    background: color-mix(in srgb, var(--c-paper) 55%, transparent);
+    max-width: 60ch;
+  }
+  .press__copy {
+    margin-top: var(--space-m);
+  }
+  .press__photos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-m);
+  }
+  .press__thumb {
+    aspect-ratio: 3 / 4;
+    margin-bottom: 0.5rem;
+  }
+  .press .link {
+    color: var(--c-soil);
+    text-decoration-color: var(--c-basil-deep);
+  }
+  .press .link:hover {
+    color: var(--c-paper);
+  }
+  @media (max-width: 799px) {
+    .contact,
+    .press__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+  }
+</style>

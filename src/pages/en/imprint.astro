@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LegalPage from '../../components/pages/LegalPage.astro';
+import { getEntry } from 'astro:content';
+const page = await getEntry('pages', 'en/imprint');
+if (!page) throw new Error('Missing content/pages/en/imprint.md');
+---
+
+<BaseLayout title={`${page.data.title} · Eirik Falk, Tenor`} description={page.data.description}>
+  <LegalPage locale="en" page="imprint" />
+</BaseLayout>

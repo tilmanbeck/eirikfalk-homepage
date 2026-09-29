@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AboutPage from '../../components/pages/AboutPage.astro';
+import { getEntry } from 'astro:content';
+const page = await getEntry('pages', 'en/about');
+if (!page) throw new Error('Missing content/pages/en/about.md');
+---
+
+<BaseLayout title={`${page.data.title} · Eirik Falk, Tenor`} description={page.data.description}>
+  <AboutPage locale="en" />
+</BaseLayout>

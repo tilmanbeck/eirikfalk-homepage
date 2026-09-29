@@ -51,7 +51,7 @@ URL scheme: every page exists under `/de/...` and `/en/...`. The root `/` redire
 7. Contact block with email and phone.
 
 ### About
-- Two-column layout: portrait beside a short bio (~150 words, DE and EN).
+- Two-column layout: concert photo (from Eirik's Instagram, 2730×1820, credit pending) beside the bio (DE and EN); portrait in the CV block.
 - Structured CV list: education (Akademie für Tonkunst Darmstadt, Hochschule für Kirchenmusik Bayreuth — details as placeholders), teachers, masterclasses, awards. Empty groups are hidden.
 - Facts: based in Darmstadt, active as soloist and ensemble singer in opera, oratorio, cantata and Lied, in Germany and abroad.
 
@@ -71,7 +71,7 @@ Three sections with anchors, each with a short text and a contact call-to-action
 - **Referenzen / Past engagements**: grouped by genre (Oper, Oratorium, Kantate, Lied), each entry with work, role, ensemble or conductor, venue, year.
 - **Repertoire**: works Eirik can sing, grouped by genre, with composer, work, role/part.
 - Horizontal-rule list styling with a narrow text column (Cargo M069 trait).
-- Seeded at launch from Operabase and Muvac public listings, marked for Eirik's verification.
+- Operabase blocks automated access and Muvac lists no works, so both lists are seeded with clearly marked placeholders (`placeholder: true`) for Eirik to replace.
 
 ### Media
 - Photo grid with lightbox and photographer credit (credit hidden when empty).
@@ -260,8 +260,8 @@ Publishing flow: Eirik saves in the editor → commit to `main` → Vercel build
 |---|---|---|
 | Bio DE/EN (~150 words) | Eirik | Placeholder by Tilman/Claude, Wagner/oratorio flavour |
 | CV details: teachers, masterclasses, awards, dates | Eirik | Placeholder groups; empty groups hidden |
-| Past engagements (References) | Eirik verifies | Seeded from Operabase and Muvac |
-| Repertoire | Eirik | Seeded from Operabase and Muvac |
+| Past engagements (References) | Eirik | Placeholders (Operabase not accessible, Muvac has no list) |
+| Repertoire | Eirik | Placeholders |
 | Upcoming concerts | Eirik | Empty state |
 | Photographer credits for the four portraits | Eirik | Credit field hidden when empty |
 | High-resolution originals of the portraits (≥ 3000 px) for press kit and hero | Eirik | Current 1100 px files, split-layout hero |
@@ -278,7 +278,7 @@ Publishing flow: Eirik saves in the editor → commit to `main` → Vercel build
 
 Contact details to use: eirikefalk@gmail.com, 01522 3963739 (from the Wix site). Instagram: instagram.com/eirikefalk. Operabase: operabase.com/eirik-falk-a2151202. Muvac: muvac.com/de/profile/eirik-falk.
 
-Existing assets: `media/images/portrait_1..4.jpeg` (1058–1280 × 1448–1600 px, 115–308 KB, all portrait orientation; portrait_4 is identical to a Wix site image). Wix site images: piano/guitar room (1200×1600), bead-art rabbit (not used).
+Existing assets: `media/images/performance_1.jpg` and `performance_2_bw.jpg` (concert photos from Instagram, added 2026-09-29; the saved-webpage byproducts next to them are git-ignored), `media/images/portrait_1..4.jpeg` (1058–1280 × 1448–1600 px, 115–308 KB, all portrait orientation; portrait_4 is identical to a Wix site image). Wix site images: piano/guitar room (1200×1600), bead-art rabbit (not used).
 
 ---
 

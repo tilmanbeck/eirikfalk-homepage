@@ -1,0 +1,102 @@
+---
+/**
+ * Two-click embed: nothing is loaded from the provider until the visitor presses play.
+ */
+import { Image } from 'astro:assets';
+import { useTranslations, type Locale } from '../i18n/ui';
+
+interface Props {
+  url: string;
+  title: string;
+  poster?: ImageMetadata;
+  locale: Locale;
+}
+const { url, title, poster, locale } = Astro.props;
+const t = useTranslations(locale);
+
+function toEmbed(u: string): { src: string; provider: string; ratio: string } {
+  const yt = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+  if (yt) return { src: `https://www.youtube-nocookie.com/embed/${yt[1]}?autoplay=1`, provider: 'YouTube', ratio: '16 / 9' };
+  const vim = u.match(/vimeo\.com\/(\d+)/);
+  if (vim) return { src: `https://player.vimeo.com/video/${vim[1]}?autoplay=1&dnt=1`, provider: 'Vimeo', ratio: '16 / 9' };
+  if (u.includes('soundcloud.com'))
+    return { src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(u)}&auto_play=true`, provider: 'SoundCloud', ratio: '16 / 5' };
+  return { src: u, provider: new URL(u).hostname, ratio: '16 / 9' };
+}
+const { src, provider, ratio } = toEmbed(url);
+---
+
+<div class="embed" data-embed={src} style={`--ratio:${ratio}`}>
+  {poster && <Image class="embed__poster" src={poster} alt="" widths={[480, 960]} sizes="(max-width: 799px) 100vw, 60vw" />}
+  <button class="embed__btn" type="button">
+    <span class="embed__play" aria-hidden="true">▶</span>
+    <span class="embed__label">{t('media.load')}: {title}</span>
+    <span class="embed__note small">{t('media.consent').replace('{provider}', provider)}</span>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.embed').forEach((box) => {
+    box.querySelector('button')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = box.dataset.embed ?? '';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.title = box.querySelector('.embed__label')?.textContent ?? '';
+      box.replaceChildren(iframe);
+    });
+  });
+</script>
+
+<style>
+  .embed {
+    position: relative;
+    aspect-ratio: var(--ratio);
+    background: var(--c-soil);
+    overflow: hidden;
+  }
+  .embed :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .embed__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+  }
+  .embed__btn {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    display: grid;
+    place-content: center;
+    gap: 0.5rem;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    color: var(--c-paper);
+    cursor: pointer;
+    padding: var(--space-m);
+    font: inherit;
+  }
+  .embed__play {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .embed__label {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+  }
+  .embed__note {
+    opacity: 0.8;
+  }
+  .embed__btn:hover .embed__play {
+    color: var(--c-tomato);
+  }
+</style>

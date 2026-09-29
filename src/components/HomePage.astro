@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import { getCollection, getEntry } from 'astro:content';
 import { useTranslations, route, pick, site, type Locale } from '../i18n/ui';
 import Obfuscated from './Obfuscated.astro';
+import SocialLinks from './SocialLinks.astro';
 import portrait from '../assets/portraits/portrait-1.jpg';
 import pianoRoom from '../assets/piano-room.jpg';
 
@@ -39,6 +40,7 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
         <a class="btn" href={route('contact', locale)}>{t('cta.contact')} <span class="arrow" aria-hidden="true">→</span></a>
         <a class="link link--quiet" href={route('concerts', locale)}>{t('nav.concerts')}</a>
       </div>
+      <SocialLinks locale={locale} class="hero__social" />
     </div>
     <figure class="hero__figure">
       <div class="hero__block" aria-hidden="true"></div>
@@ -217,6 +219,9 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
     align-items: center;
     gap: var(--space-m);
   }
+  .hero__social {
+    margin-top: var(--space-l);
+  }
   .hero__figure {
     grid-column: 7 / span 6;
     margin: 0;
@@ -251,7 +256,6 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
   .intro__text {
     font-family: var(--font-display);
     font-weight: var(--display-weight);
-    font-variation-settings: 'opsz' 24;
     font-size: var(--step-2);
     line-height: 1.35;
     text-wrap: pretty;
@@ -380,7 +384,6 @@ const fmtWeekday = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', 
     margin: 0 0 var(--space-m);
     font-size: var(--step-2);
     line-height: 1.3;
-    font-variation-settings: 'opsz' 36;
     text-wrap: pretty;
   }
 

@@ -2,7 +2,6 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import FontToggle from '../components/FontToggle.astro';
 import { alternatePath, locales, type Locale } from '../i18n/ui';
 
 interface Props {
@@ -15,7 +14,6 @@ const locale = (Astro.currentLocale ?? 'de') as Locale;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const site = Astro.site ?? new URL('https://eirikfalk.de');
 const canonical = new URL(path, site);
-const fontPreview = import.meta.env.PUBLIC_FONT_PREVIEW !== 'false';
 ---
 
 <!doctype html>
@@ -40,17 +38,6 @@ const fontPreview = import.meta.env.PUBLIC_FONT_PREVIEW !== 'false';
     <meta property="og:locale" content={locale === 'de' ? 'de_DE' : 'en_GB'} />
     <meta name="theme-color" content="#f4f2ec" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <script is:inline>
-      // Font pairing preview: ?fonts=b or a remembered choice. Runs before paint to avoid a flash.
-      (function () {
-        try {
-          var q = new URLSearchParams(location.search).get('fonts');
-          if (q === 'a' || q === 'b') localStorage.setItem('fonts', q);
-          var f = localStorage.getItem('fonts');
-          if (f === 'b') document.documentElement.setAttribute('data-fonts', 'b');
-        } catch (e) {}
-      })();
-    </script>
   </head>
   <body>
     <a class="skip sr-only" href="#main">{locale === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}</a>
@@ -59,7 +46,6 @@ const fontPreview = import.meta.env.PUBLIC_FONT_PREVIEW !== 'false';
       <slot />
     </main>
     <Footer />
-    {fontPreview && <FontToggle />}
     <script>
       // Scroll reveal. Motivation: brings sections in one at a time so the eye lands on the headline first.
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -43,11 +43,12 @@ URL scheme: every page exists under `/de/...` and `/en/...`. The root `/` redire
 
 ### Home
 1. Hero: split layout, portrait at column width on one side, name, "Tenor" and a one-line intro on the other.
-2. Two-sentence introduction with link to About.
-3. Next three concerts, or the empty state "Aktuell keine Konzerte" / "No upcoming shows".
-4. Three service teasers: Solist, Chorist, Gesangsunterricht.
-5. One testimonial (from the teaching reviews, labelled as such).
-6. Contact block with email and phone.
+2. Social row under the hero button: Instagram, Operabase, Muvac (decided 2026-09-29).
+3. Two-sentence introduction with link to About.
+4. Next three concerts, or the empty state "Aktuell keine Konzerte" / "No upcoming shows".
+5. Three service teasers: Solist, Chorist, Gesangsunterricht.
+6. One testimonial (from the teaching reviews, labelled as such).
+7. Contact block with email and phone.
 
 ### About
 - Two-column layout: portrait beside a short bio (~150 words, DE and EN).
@@ -171,7 +172,7 @@ Validation: missing required field or malformed date fails the build; the previo
 
 Rules: Cherry Tomato is never used for body text and never on Basil. Potting Soil on Basil only at heading sizes (contrast ~4.1:1). One fixed theme, no dark-mode toggle.
 
-**Typography.** Fraunces (variable serif) for headings and pull quotes; Manrope or Geist for body, lists and metadata. All fonts self-hosted (GDPR). Fallback pairing if Fraunces reads too ornate: Instrument Serif + Instrument Sans. Final choice shown side by side in the home-page round.
+**Typography.** Decided 2026-09-29 on the home-page preview: Instrument Serif for headings, pull quotes and display numbers; Instrument Sans (variable) for body, lists and metadata. All fonts self-hosted (GDPR). Fraunces + Manrope was the rejected alternative.
 
 **Traits taken from the inspiration sites.**
 - Hero portrait as the first impression (jeanphilippchey.de, joachim-hoechbauer.com) — adapted to a split layout because the available portraits are ~1100 px wide.

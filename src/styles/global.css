@@ -1,7 +1,4 @@
 /* ---------- Fonts (self-hosted via fontsource, no external requests) ---------- */
-@import '@fontsource-variable/fraunces';
-@import '@fontsource-variable/fraunces/wght-italic.css';
-@import '@fontsource-variable/manrope';
 @import '@fontsource/instrument-serif';
 @import '@fontsource/instrument-serif/400-italic.css';
 @import '@fontsource-variable/instrument-sans';
@@ -20,12 +17,11 @@
   --c-tomato-text: #b8371f;  /* deepened tomato for links and buttons (5.2:1 on paper, paper text on it 5.2:1) */
   --c-tomato-deep: #9e2e19;  /* hover state for links and buttons */
 
-  /* Pairing A (default): Fraunces + Manrope */
-  --font-display: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-body: 'Manrope Variable', 'Helvetica Neue', Arial, sans-serif;
-  --display-weight: 380;
-  --display-opsz: 144;
-  --display-tracking: -0.015em;
+  /* Typography: Instrument Serif for display, Instrument Sans for everything else */
+  --font-display: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Instrument Sans Variable', 'Helvetica Neue', Arial, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.005em;
 
   /* Type scale (fluid) */
   --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
@@ -51,13 +47,6 @@
   --radius: 2px; /* shape lock: near-sharp everywhere */
 }
 
-/* Pairing B: Instrument Serif + Instrument Sans (preview toggle) */
-:root[data-fonts='b'] {
-  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'Instrument Sans Variable', 'Helvetica Neue', Arial, sans-serif;
-  --display-weight: 400;
-  --display-tracking: -0.005em;
-}
 
 /* ---------- Reset-ish ---------- */
 *,
@@ -93,7 +82,6 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-variation-settings: 'opsz' var(--display-opsz);
   letter-spacing: var(--display-tracking);
   line-height: 1.05;
   margin: 0;
@@ -145,7 +133,6 @@ a {
 .display {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-variation-settings: 'opsz' var(--display-opsz);
   letter-spacing: var(--display-tracking);
   line-height: 1.05;
 }
